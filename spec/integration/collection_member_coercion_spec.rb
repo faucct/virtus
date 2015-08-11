@@ -66,6 +66,18 @@ describe User do
         it { is_expected.to eql('919-444-3265') }
       end
     end
+
+    describe 'insertion' do
+      let(:new_phone) { { :number => '913-064-6616' } }
+      before { instance.phone_numbers << new_phone }
+      subject { instance.phone_numbers.last }
+
+      it { is_expected.to be_instance_of(PhoneNumber) }
+      describe '#number' do
+        subject { super().number }
+        it { is_expected.to eql(new_phone[:number]) }
+      end
+    end
   end
 
   describe '#addresses' do
@@ -91,6 +103,19 @@ describe User do
     describe '#postal_code' do
       subject { super().postal_code }
       it { is_expected.to eql('21234')        }
+    end
+
+    describe 'insertion' do
+      subject { instance.addresses.count }
+      let(:address) { { :address => '4321', :locality => 'Sometown', :region => "CD", :postal_code => '123' } }
+      before { instance.addresses << address }
+
+      it 'adds new address' do
+        is_expected.to eql(2)
+        instance.addresses.each do |address|
+          expect(address).to be_instance_of(Address)
+        end
+      end
     end
   end
 end
