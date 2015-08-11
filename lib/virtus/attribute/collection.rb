@@ -84,6 +84,7 @@ module Virtus
       def finalize
         return self if finalized?
         @member_type = @options[:member_type].finalize
+        extend(CollectionAccessor) if is_a?(Accessor) && is_a?(Coercible)
         super
       end
 
