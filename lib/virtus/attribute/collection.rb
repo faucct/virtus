@@ -84,13 +84,31 @@ module Virtus
       def finalize
         return self if finalized?
         @member_type = @options[:member_type].finalize
-        extend(CollectionAccessor) if is_a?(Accessor) && is_a?(Coercible)
+        if is_a?(Accessor) && is_a?(Coercible)
+          member_type = @member_type
+          @primitive = Class.new(@primitive) do
+            define_method :coerce do |value|
+              member_type.coerce value
+            end
+            include CoercibleCollection
+          end
+        end
         super
       end
 
       # @api private
       def finalized?
         super && member_type.finalized?
+      end
+
+      module CoercibleCollection
+        def <<(value)
+          super(coerce value)
+        end
+
+        def []=(key, value)
+          super(key, coerce(value))
+        end
       end
 
     end # class Collection

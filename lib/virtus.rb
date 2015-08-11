@@ -283,6 +283,5 @@ require 'virtus/attribute/nullify_blank'
 
 require 'virtus/attribute/boolean'
 require 'virtus/attribute/collection'
-require 'virtus/attribute/collection_accessor'
 require 'virtus/attribute/hash'
 require 'virtus/attribute/embedded_value'
