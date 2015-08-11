@@ -1,25 +1,17 @@
 module Virtus
   class Attribute
     module CollectionAccessor
-      @@collections = {}
-      @@mutex = Mutex.new
-
-      def get(instance)
-        value = super
-        @@mutex.synchronize do
-          @@collections[value.class] ||= Class.new(value.class).tap { |klass| klass.include(CoercibleCollection) }
-        end.new(value).tap do |collection|
-          collection.instance_variable_set('@member_type', member_type)
+      def self.extended(descendant)
+        primitive = Class.new(descendant.primitive).tap do |klass|
+          klass.include(CoercibleCollection)
+          klass.instance_variable_set('@member_type', descendant.member_type)
         end
+        descendant.instance_variable_set('@primitive', primitive)
       end
 
       module CoercibleCollection
         def <<(value)
-          if value.kind_of? ::Hash
-            super @member_type.coerce value
-          else
-            super
-          end
+          super self.class.instance_variable_get('@member_type').coerce value
         end
       end
     end
